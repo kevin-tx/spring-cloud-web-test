@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ek.iml" filepath="$PROJECT_DIR$/ek.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../svc-a/svc-a.iml" filepath="$PROJECT_DIR$/../svc-a/svc-a.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../svc-b/svc-b.iml" filepath="$PROJECT_DIR$/../svc-b/svc-b.iml" />
+    </modules>
+  </component>
+</project>

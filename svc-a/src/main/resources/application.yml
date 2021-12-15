@@ -1,0 +1,90 @@
+server:
+  port: 7801
+  servlet:
+    context-path: /kev
+
+
+
+spring:
+  application:
+    name: server-a
+  datasource:
+    url: jdbc:mysql://192.168.10.10:3306/jdbc
+    username: homestead
+    password: secret
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka/,http://localhost:7002/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 5
+
+management:
+  endpoint:
+    health:
+      show-details: always   #允许显示/actuator/health信息
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: "*"
+
+
+hystrix:
+  command:
+    default:
+      circuitBreaker:
+        enabled: true  #是否打开熔断器，默认true
+        requestVolumeThreshold: 5  #当在配置时间窗口内达到此数量，并且失败比例达到errorThresholdPercentage 时，进行短路。默认20个
+        sleepWindowInMilliseconds: 10000  #短路多久以后开始尝试是否恢复，默认5s
+        errorThresholdPercentage: 10  #出错百分比阈值，当达到此阈值后，开始短路。默认50%
+#        forceOpen: true  #如果该属性设置为true，强制断路器进入打开状态，将会拒绝所有的请求。  -- 优先级更高
+#        forceClosed: true  #如果该属性设置为true，强制断路器进入关闭状态，将会允许所有的请求，无视错误率。
+      execution:
+        isolation:
+          strategy: THREAD  #隔离策略，THREAD线程池隔离，SEMAPHORE信号量隔离，默认THREAD
+          thread:
+            timeoutInMilliseconds: 2000  #任务执行超时时间，默认1秒
+            interruptOnTimeout: true  #HystrixCommand.run()方法执行发生超时，是否中断命令的 run 方法的执行
+            interruptOnFutureCancel: false  #HystrixCommand.run()方法取消时是否中断线程，默认为false
+          semaphore:
+            maxConcurrentRequests: 10  #当使用ExecutionIsolationStrategy.SEMAPHORE时，允许的最大请求数。如果达到最大并发数时，后续请求会被拒绝。默认为10
+        timeout:
+          enabled: true  #是否开启超时检测
+#      threadPoolKeyOverride: null  #线程池名称默认为null，会将null处理为服务名称
+      fallback:
+#        isolation:
+#          semaphore:
+#            maxConcurrentRequests: 10  #设置调用线程产生的HystrixCommand.getFallback()方法的允许最大请求数目。默认为10
+        enabled: true  #是否尝试降级，默认为true
+      metrics:
+        rollingStats:
+          timeInMilliseconds: 20000 #设置统计的时间窗口值的毫秒值，circuit break的打开会根据1个rolling window的统计来计算。若rolling window被设为10000毫秒，则rolling window会被分成n个buckets，每个bucket包含success，failure，timeout，rejection的次数的统计信息。默认10000
+          numBuckets: 10  #设置一个rolling window被划分的数量，若numBuckets＝10，rolling window＝10000，那么一个bucket的时间即1秒。必须符合rolling window % numberBuckets == 0。默认10
+#        rollingPercentile:
+#          enabled: true  #此属性指示是否应跟踪请求耗时，并将其计算为百分点。如果禁用它们，则所有汇总统计 (平均值、百分点) 都将返回为 -1，默认true
+#          timeInMilliseconds: 60000  #此属性设置滚动百分比窗口的持续时间，其中保留执行时间以允许百分比计算 (以毫秒为单位)，此属性只影响初始度量值的创建, 并且在启动后对此属性进行的调整将不会生效，默认60000
+#          numBuckets: 6  #属性设置滚动百分比窗口划分的桶数，例如，滚动百分比窗口持续时间为60秒，默认配置6个桶，那么一个桶用于存放10秒的统计数据。配置值必须符合以下条件 metrics.rollingPercentile.timeInMilliseconds % metrics.rollingPercentile.numBuckets == 0，否则会抛出异常。此属性只影响初始度量值的创建，并且在启动后对此属性进行的调整将不会生效，默认6
+#          bucketSize: 100  #此属性设置每个桶保留的最大执行时间数，如果超出桶的最大执行数量，则会记录到下一个桶，此属性只影响初始度量值的创建，并且在启动后对此属性进行的调整将不会生效。默认100
+#        healthSnapshot:
+#          intervalInMilliseconds: 500 #此属性设置在允许运行健康快照以计算成功和错误百分比并影响断路器状态的等待间隔的时间，默认500ms
+#      requestLog:
+#        enabled: true  #是否开启请求日志。默认true
+#      requestCache:
+#        enabled: true  #是否开启请求缓存。默认开启但是没有任何逻辑处理，默认true
+  #hystrix线程池默认参数配置（hystrix默认一个服务对应一个线程池）
+  threadpool:
+    default:
+      coreSize: 2  #并发执行的最大线程数，默认10
+      maximumSize: 3  #最大线程数，默认10
+      keepAliveTimeMinutes: 1  #空闲线程存活时间，默认一分钟
+      maxQueueSize: -1  #最大队列数，默认为-1，-1不会排队，前程池满了就拒绝访问
+#      queueSizeRejectionThreshold: 5  #即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝。因为maxQueueSize不能被动态修改，这个参数将允许我们动态设置该值。if maxQueueSize == -1，该字段将不起作用
+      allowMaximumSizeToDivergeFromCoreSize: true  #是否允许队列满之后新建线程到达到设置的最大线程数，如果为false，当队列满后就执行降级方法
+#      metrics:
+#        rollingStats:
+#          timeInMilliseconds: 10000  #此属性设置统计滚动窗口的持续时间 ，以毫秒为单位，默认10000
+#          numBuckets: 10  #将rolling window划分为n个buckets，默认1

@@ -1,0 +1,36 @@
+server:
+  port: 7001
+spring:
+  application:
+    name: eureka-server
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7001/eureka  #服务注册的地址,将当前服务注册到eureka中.这里是将自己注册要自己.必须要带 /eureka
+
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 10
+
+#测试配置注入
+person:
+  boss: false
+  maps:
+    k1: v1
+    k2: 14
+  lists:
+    - name: d1
+      age: 2
+    - name: d2
+      age: 3
+    - {name: d3,age: 4}
+  birth: 2017/12/15
+  dog:
+    name: p_dog
+    age: 15
+  age: 13
+  last-name: 张三
+  arr: [s1,s2,s3]
+arrays: 'a1,a2'
